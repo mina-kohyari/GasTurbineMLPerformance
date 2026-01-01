@@ -1,0 +1,19 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+env/
+venv/
+*.env
+
+# PyCharm files
+.idea/
+*.iml
+
+# Data files (optional: if large)
+data/*.csv
+
+# Results / plots
+results/*.png
