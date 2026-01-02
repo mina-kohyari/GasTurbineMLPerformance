@@ -1,27 +1,46 @@
-import joblib
-import numpy as np
-from scipy.optimize import minimize
 
-# Load model
-model = joblib.load('src/efficiency_model.pkl')
+import pandas as pd
+from pathlib import Path
 
-# Control: Optimize FuelFlow and RPM for max efficiency
-def objective(u):
-    # u[0] = FuelFlow, u[1] = RPM
-    x = np.array([[u[0], u[1], 20, 300]])  # Pressure=20 bar, Temperature=300°C
-    pred = model.predict(x)[0]
-    return -pred  # negative because we want to maximize
+# -----------------------------
+# Paths
+# -----------------------------
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_PATH = BASE_DIR / "data" / "turbine_data.csv"
+CLEAN_PATH = BASE_DIR / "data" / "turbine_data_clean.csv"
 
+# -----------------------------
+# Load data
+# -----------------------------
+df = pd.read_csv(DATA_PATH, sep="\t")  # tab-separated file
 
-# Initial guess
-u0 = [100, 4000]
-bounds = [(50, 200), (3000, 6000)]
+print("Dataset loaded successfully")
+print("Original shape:", df.shape)
 
+print("\nColumn names:")
+print(df.columns)
 
-res = minimize(objective, u0, bounds=bounds)
-optimal_fuel, optimal_rpm = res.x
-max_efficiency = -res.fun
+# -----------------------------
+# Convert numeric columns
+# -----------------------------
+for col in df.columns:
+    if col.lower() not in ["hour_time", "time", "date"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
-print(f"Optimal Fuel Flow: {optimal_fuel:.2f} kg/s")
-print(f"Optimal RPM: {optimal_rpm:.2f} rev/min")
-print(f"Predicted Max Efficiency: {max_efficiency:.4f}")
+# -----------------------------
+# Handle missing values
+# -----------------------------
+print("\nMissing values before cleaning:")
+print(df.isnull().sum())
+
+df.dropna(inplace=True)
+
+print("\nCleaned shape:", df.shape)
+
+# -----------------------------
+# Save cleaned dataset
+# -----------------------------
+df.to_csv(CLEAN_PATH, index=False)
+
+print(f"\nCleaned dataset saved to: {CLEAN_PATH}")
+print("Data preprocessing completed successfully.")
