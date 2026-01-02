@@ -2,45 +2,42 @@ import pandas as pd
 from pathlib import Path
 
 
-# -----------------------------
-# Paths
-# -----------------------------
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_PATH = BASE_DIR / "data" / "turbine_data.csv"
-CLEAN_PATH = BASE_DIR / "data" / "turbine_data_clean.csv"
+def process_data(DATA_PATH):
+    from pathlib import Path
+    import pandas as pd
 
-# -----------------------------
-# Load data
-# -----------------------------
-df = pd.read_csv(DATA_PATH)  # tab-separated file
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    DATA_PATH = BASE_DIR / "data" / "turbine_data.csv"
+    CLEAN_PATH = BASE_DIR / "data" / "turbine_data_clean.csv"
 
-print("Dataset loaded successfully")
-print("Original shape:", df.shape)
+    # Load data
+    df = pd.read_csv(DATA_PATH)
+    print("Dataset loaded successfully")
+    print("Original shape:", df.shape)
 
-print("\nColumn names:")
-print(df.columns)
+    # Strip column names
+    df.columns = df.columns.str.strip()
 
-# -----------------------------
-# Convert numeric columns
-# -----------------------------
-for col in df.columns:
-    if col.lower() not in ["hour_time", "time", "date"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
+    # Convert numeric columns
+    for col in df.columns:
+        if col.lower() not in ["hour_time", "time", "date"]:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
-# -----------------------------
-# Handle missing values
-# -----------------------------
-print("\nMissing values before cleaning:")
-print(df.isnull().sum())
+    # Drop missing values
+    print("Missing values before cleaning:")
+    print(df.isnull().sum())
+    df.dropna(inplace=True)
+    print("Cleaned shape:", df.shape)
 
-df.dropna(inplace=True)
+    # Save cleaned dataset
+    df.to_csv(CLEAN_PATH, index=False)
+    print(f"Cleaned dataset saved to: {CLEAN_PATH}")
 
-print("\nCleaned shape:", df.shape)
+    # Features & target
+    TARGET = "Real power"
+    DROP_COLS = ["Hour_Time"]
 
-# -----------------------------
-# Save cleaned dataset
-# -----------------------------
-df.to_csv(CLEAN_PATH, index=False)
+    X = df.drop(columns=[TARGET] + DROP_COLS)
+    y = df[TARGET]
 
-print(f"\nCleaned dataset saved to: {CLEAN_PATH}")
-print("Data preprocessing completed successfully.")
+    return X, y

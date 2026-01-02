@@ -8,13 +8,13 @@ from src.control_optimization import optimize
 BASE_DIR = Path(__file__).resolve().parent
 DATA_PATH = BASE_DIR / "data" / "turbine_data_clean.csv"
 
-# ⃣DATA PROCESSING
+### DATA PROCESSING
 X, y = process_data(DATA_PATH)
 
-# 2️⃣ TRAIN MODEL
+####️⃣ TRAIN MODEL
 model, metrics = train_model(X, y)
 
-# 3️⃣ OPTIMIZATION
+### OPTIMIZATION
 result = optimize(model, X)
 
 print("\nPipeline completed successfully")
