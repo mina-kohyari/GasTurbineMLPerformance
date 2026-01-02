@@ -44,12 +44,12 @@ feature_names = X.columns
 fi_df = pd.DataFrame({
     "Feature": feature_names,
     "Importance": importances
-}).sort_values(by="Importance", ascending=False)
+}).sort_values(by="Importance characters", ascending=False)
 
 plt.figure(figsize=(10,6))
 plt.barh(fi_df["Feature"].head(15)[::-1], fi_df["Importance"].head(15)[::-1])
 plt.xlabel("Importance")
-plt.title("Top 15 Feature Importances")
+plt.title("Top 15 Feature Importance characters")
 plt.tight_layout()
 plt.savefig(BASE_DIR / "plots" / "feature_importance.png")
 plt.show()
